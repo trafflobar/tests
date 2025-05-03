@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+		<title>Aviator Calculator</title>
+		
+		<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+		<script type="text/javascript" src="jquery.min.js"></script>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+			}
+
+			html {
+				font-size: 15px;     
+
+				-webkit-user-select: none; /* Safari */
+				-ms-user-select: none; /* IE 10 and IE 11 */
+				user-select: none; /* Standard syntax */ 
+			}
+
+			body {
+				font-family: 'Tahoma', sans-serif;
+				cursor: default;
+				color: white;
+				background: #090310;
+			}
+
+			.background {
+			    content: " ";
+			    left: 0;
+			    top: 0;
+			    width: 100%;
+			    height: 100%;
+			    position: fixed;
+			    background-image: url(background.jpg);
+			    background-size: cover;
+			    background-position: bottom left;
+			    background-repeat: no-repeat;
+			    z-index: -1;
+			}
+
+			.screen {
+				padding: 30px;
+				padding-top: 15px;
+				
+				text-align: center;
+				position: absolute;
+
+				left: 0;
+				right: 0;
+				margin: 0 auto;
+
+				max-width: 400px;			
+			}
+
+				.header {
+				    font-size: 38px;
+				    font-weight: bold;
+				    font-style: italic;
+				    margin: 0 auto;
+				    max-width: 230px;
+				    background-image: url(logo.png);
+				    background-position: top right;
+				    background-repeat: no-repeat;
+				    background-size: 80px;
+				    padding-top: 10px;
+				    text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.4), 0px 0px 20px #f95c5c;
+				}
+					.header-left {
+						text-align: left;
+					}
+					.header-right {
+						text-align: right;
+					}
+
+
+				.info {
+					margin-top: 20px;
+					font-size: 11px;
+					font-weight: bold;
+				}
+
+				.arrow-down {
+					background-image: url(arrow-down.png);
+					background-position: center center;
+					background-repeat: no-repeat;
+					background-size: contain;
+					height: 18px;
+
+					margin-top: 10px;
+					margin-block: 10px;
+
+					opacity: 0.45;
+				}
+
+				.currency-box {
+					background-color: rgba(57, 48, 55, 0.8);;
+					padding: 10px;
+					border-radius: 10px;
+
+					margin-top: 25px;
+
+					box-shadow: inset 0px 3px 3px 0px rgba(255, 255, 255, 0.15);
+				}
+					.currency-box-header {
+						font-size: 16px;
+						font-weight: bold;
+					}
+
+					.currency-box-buttons {
+						display: grid;
+						grid-template-columns: 1fr 1fr 1fr;
+						gap: 5px;		
+						margin-top: 15px;				
+					}
+						.currency-button {
+							font-size: 12px;
+							padding: 5px;
+							border-radius: 10px;
+							border: 2px solid white;
+							transition: 0.6s;
+						}
+							.currency-symbol {
+								font-size: 16px;
+								font-weight: bold;
+							}
+
+						.currency-selected {
+							background-color: white;
+							box-shadow: 0px 0px 10px white;
+							color: black;
+						}
+
+				.make-bet {
+					display: grid;
+					grid-template-columns: 1fr 1fr;
+					gap: 10px;		
+				}
+					.bet-side {
+						background-color: rgba(57, 48, 55, 0.8);
+						padding: 10px;
+						border-radius: 10px;
+
+						position: relative;
+						overflow: hidden;
+
+						box-shadow: inset 0px 3px 3px 0px rgba(255, 255, 255, 0.15);
+					}
+
+					.bet-side-header {
+						font-size: 12px;
+						font-weight: bold;
+					}
+
+					.bet-side-text {
+						margin-top: 10px;
+					    font-size: 27px;
+					    font-weight: bold;
+					    text-shadow: 0px 0px 14px #fb73f1;
+					}
+
+					.bet-loading {
+						position: absolute;
+					    width: 100%;
+					    height: 100%;
+					    background: #353034;
+						border-radius: 10px;
+					    top: 0;
+					    left: 0;
+
+					    transition: 0.5s;
+
+					    opacity: 1.0;
+
+					    box-shadow: inset 0px 3px 3px 0px rgba(255, 255, 255, 0.15);
+					}
+
+
+				.signal-buttons {
+					display: grid;
+					grid-template-columns: 1fr 1fr;
+					gap: 10px;		
+				}
+
+					.buttons-header {
+						font-size: 15px;
+						font-weight: bold;
+						margin-bottom: 15px;
+					}
+
+					.button-signal {
+						border-radius: 10px;
+
+						font-size: 16px;
+						font-weight: bold;
+
+						position: relative;
+					}
+
+						.button-green {
+							background: linear-gradient(45deg, #5bd13d, #1b3d1c);
+							border-bottom: 3px solid #315913;
+							box-shadow: 0px 0px 25px #3a6d1a;
+						}
+
+						.button-red {
+							background: linear-gradient(45deg, #d13d3d, #3d1b1b);
+							border-bottom: 3px solid #591313;
+							box-shadow: 0px 0px 25px #6d1a1a;
+						}
+
+						.button-signal-center {
+							padding: 10px 0px;
+						    background-position: left center;
+						    background-repeat: no-repeat;
+						    background-size: 26px;
+						    display: inline-block;
+						    padding-left: 36px;
+						    margin-top: 2px;
+						}
+
+						.button-desc {
+						    font-size: 12px;
+						    font-weight: 100;
+						    margin-bottom: 10px;
+						}
+
+
+			.hidden {
+				pointer-events: none;
+				opacity: 0;
+				transform: translateY(-40px) scale(0.8);
+				transition: 0.8s;
+			}
+				.hidden-show {
+					opacity: 1.0 !important;
+					transform: translateY(0px) scale(1.0000001) !important;
+					pointer-events: auto !important;
+				}
+
+
+				.loader-wrap {
+					position: absolute;
+
+					margin: 0 auto;
+					left: 0;
+					right: 0;
+
+					top: 50%;
+					transform: translateY(-50%);
+
+					text-align: center;
+				}
+
+				.loader {
+					margin: 0 auto;
+				}
+
+				.loader {
+				    width: 28px;
+				    aspect-ratio: 1;
+				    border-radius: 50%;
+				    border: 4px solid rgba(255, 255, 255, 0.5);
+				    border-right-color: #fbff00;
+				    animation: l2 1.3s infinite linear;
+				}
+				@keyframes l2 {to{transform: rotate(1turn)}}
+
+		</style>
+
+		<script type="text/javascript">
+
+			const sleep = m => new Promise(r => setTimeout(r, m));
+
+			function random(min, max) 
+			{
+			    let rand = min + Math.random() * (max + 1 - min);
+			    return Math.floor(rand);
+			}
+
+			function randomFloat(min, max) 
+			{
+			    let rand = min + Math.random() * (max - min);
+			    return rand;
+			}
+
+			$(document).ready(function () {
+
+
+
+				// Telegram API
+				let tg = window.Telegram;
+
+				if(tg != undefined)
+				{
+					if (tg.WebApp != undefined && tg.WebApp.initData != undefined)
+					{
+						let safe    = tg.WebApp.initData;
+
+						tg.WebApp.backgroundColor = '#090310';
+						tg.WebApp.headerColor = '#090310';
+						tg.WebApp.expand(); 
+					}    
+				}
+
+			});
+
+
+			let currencySumbol = null;
+			let currency = null;
+			let sum = 0;
+			let startSum = 0;
+			let signalLoading = false;
+
+			let loading = false;
+
+			async function setCurrency(cur)
+			{
+				if(cur == currency) return;
+				if(loading == true) return;
+				if(signalLoading == true) return;
+
+				loading = true;
+
+				$(".currency-selected").removeClass("currency-selected");
+				$("#button-"+cur).addClass("currency-selected");
+
+				if(currency != null)
+				{
+					$(".bet-loading").css("opacity", "1.0");
+					await sleep(600);
+				}
+
+				currency = cur;
+
+				if(cur == "INR") 
+				{
+					currencySumbol = "₹";
+					sum = 50;
+				}
+				else if(cur == "REAL") 
+				{
+					currencySumbol = "R$";
+					sum = 2;
+				}
+				else if(cur == "USD") 
+				{
+					currencySumbol = "$";
+					sum = 1;
+				}
+
+				startSum = sum;
+
+				rate = randomFloat(2.05, 2.15);
+
+				$("#bet-money").text(sum+currencySumbol);
+				$("#bet-rate").text(rate.toLocaleString("en-US", { maximumFractionDigits: 2, minimumFractionDigits: 2 })+"x");
+
+				$(".hidden").addClass("hidden-show");
+
+
+				await sleep(600);
+
+				$(".bet-loading").css("opacity", "0.0");
+
+				loading = false;
+			}
+
+			
+
+			async function getSignal(s)
+			{
+				if(signalLoading == true) return ;
+
+				signalLoading = true;
+
+				$(".bet-loading").css("opacity", "1.0");
+
+				await sleep(random(500, 1500));
+
+				$(".bet-loading").css("opacity", "0.0");
+
+				if(s == "lost")
+				{
+					sum = sum*2;
+				}
+				else
+				{
+					// won
+					sum = startSum;
+				}
+
+				rate = randomFloat(2.05, 2.15);
+
+				$("#bet-money").text(sum+currencySumbol);
+				$("#bet-rate").text(rate.toLocaleString("en-US", { maximumFractionDigits: 2, minimumFractionDigits: 2 })+"x");
+
+				signalLoading = false;
+			}
+
+		</script>
+
+	</head>
+	
+	<body>
+		<div class="background"></div>
+
+		<div class="screen">
+			<div class="header">
+				<div class="header-left">Aviator</div>
+				<div class="header-right">Calculator</div>
+			</div>
+
+			<div class="info">99% Win Strategy Calculator for the Aviator Game.<br><br>Note: Your balance must be at least $20 (2,000₹) to play with 99% guarantee. Works only for 1xBET.</div>
+
+			<div class="currency-box">
+				<div class="currency-box-header">Select your currency</div>
+
+				<div class="currency-box-buttons">
+					<div class="currency-button" id="button-INR" onclick="setCurrency('INR');"><div class="currency-symbol">₹</div>Indian Rupee</div>
+					<div class="currency-button" id="button-REAL" onclick="setCurrency('REAL');"><div class="currency-symbol">R$</div>Brazilian Real</div>
+					<div class="currency-button" id="button-USD" onclick="setCurrency('USD');"><div class="currency-symbol">$</div>US Dollar</div>
+				</div>
+			</div>
+
+			<div class="hidden">
+				<div class="arrow-down"></div>
+
+				<div class="make-bet">
+					<div class="bet-side">
+						<div class="bet-side-header">Place your bet</div>
+
+						<div class="bet-side-text" id="bet-money">50₹</div>
+
+						<div class="bet-loading"><div class="loader-wrap"><div class="loader"></div></div></div>
+					</div>
+					<div class="bet-side">
+						<div class="bet-side-header">Cash out</div>
+
+						<div class="bet-side-text" id="bet-rate">2.10x</div>
+
+						<div class="bet-loading"><div class="loader-wrap"><div class="loader"></div></div></div>
+					</div>
+				</div>
+
+				<div class="arrow-down"></div>
+
+				<div class="buttons-header">Tap the button after you have placed your bet and the game is over</div>
+
+				<div class="signal-buttons">
+					<div class="button-signal button-red" onclick="getSignal('lost')"><div class="button-signal-center" style="background-image: url(lost.png);">I lost</div><div class="button-desc">Tap if you lost current bet</div></div>
+					<div class="button-signal button-green" onclick="getSignal('won')"><div class="button-signal-center" style="background-image: url(won.png);">I won</div><div class="button-desc">Tap if you won current bet</div></div>
+				</div>
+			</div>
+		</div>
+
+	</body>
+</html>
